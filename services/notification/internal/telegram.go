@@ -103,24 +103,7 @@ func (t *Telegram) ListenForCommands() {
 			if err != nil {
 				message.Text = err.Error()
 			} else {
-				fullMessage := t.FormatBalanceMessage(r)
-				const maxMessageLength = 4096
-
-				for start := 0; start < len(fullMessage); start += maxMessageLength {
-					end := start + maxMessageLength
-					if end > len(fullMessage) {
-						end = len(fullMessage)
-					}
-
-					// Send part of the message
-					message.Text = fullMessage[start:end]
-					// Assuming `sendMessage` is the method to send a message. You might need to adjust this part.
-					if err := t.SendMessage(message); err != nil {
-						log.Printf("Error sending message part: %v", err)
-						break // Optional: stop sending more parts if an error occurs
-					}
-				}
-				return // Prevent sending the original message again
+				message.Text = t.FormatBalanceMessage(r)
 			}
 		// case StatsCommand:
 		// 	var r GetStatsResponse
@@ -152,7 +135,7 @@ func (t *Telegram) ListenForCommands() {
 	}
 }
 
-func (t Telegram) SendMessage(event string, msg string) error {
+func (t Telegram) SendMessage(event string, msg string) {
 	log.Info().Str("event", event).Msg("TelegramBot.SendMessage")
 
 	message := tgbotapi.NewMessage(t.chatID, msg)
@@ -162,7 +145,5 @@ func (t Telegram) SendMessage(event string, msg string) error {
 
 	if err != nil {
 		log.Error().Err(err).Msg("TelegramBot.SendMessage")
-		return err
 	}
-	return nil
 }
