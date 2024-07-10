@@ -26,6 +26,35 @@ func RunasyncApi(DB db.DB, exchange Binance, pubsub PubSub) {
 
 		pubsub.Publish(m.Reply, payload)
 	})
+
+	pubsub.Subscribe(GetPositionsEvent, func(m *nats.Msg) {
+		response := GetPositionsResponse{
+			Positions: DB.GetPositions(),
+		}
+
+		pubsub.Publish(m.Reply, response)
+	})
+
+	pubsub.Subscribe(GetTradesEvent, func(m *nats.Msg) {
+		response := GetTradesResponse{
+			Trades: DB.GetTrades(),
+		}
+
+		pubsub.Publish(m.Reply, response)
+	})
+
+	pubsub.Subscribe(GetStatsEvent, func(m *nats.Msg) {
+		var response GetStatsResponse
+
+		trades := DB.GetTrades()
+
+		if len(trades) != 0 {
+			stats := CalculateStats(trades)
+			response = GetStatsResponse{&stats}
+		}
+
+		pubsub.Publish(m.Reply, response)
+	})
 }
 
 func CalculateStats(trades []db.Trades) (stats Stats) {

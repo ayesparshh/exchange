@@ -41,13 +41,13 @@ func (t *Telegram) SetDefaultCommands() {
 	log.Trace().Msg("Setting default commands")
 	configs := tgbotapi.BotCommand{Command: ConfigsCommand, Description: "Get configs"}
 	balance := tgbotapi.BotCommand{Command: BalanceCommand, Description: "Get balance"}
-	// positions := tgbotapi.BotCommand{PositionsCommand, "Get positions"}
-	// stats := tgbotapi.BotCommand{StatsCommand, "Get statistics"}
+	positions := tgbotapi.BotCommand{Command: PositionsCommand, Description: "Get positions"}
+	stats := tgbotapi.BotCommand{Command: StatsCommand, Description: "Get statistics"}
 	// enableTrading := tgbotapi.BotCommand{EnableTradingCommand, "Enable trading"}
 	// disableTrading := tgbotapi.BotCommand{DisableTradingCommand, "Disable trading"}
 	// dump := tgbotapi.BotCommand{DumpCommand, "Dump asset"}
 
-	config := tgbotapi.NewSetMyCommands(configs, balance) //, positions, stats, enableTrading, disableTrading, dump)
+	config := tgbotapi.NewSetMyCommands(configs, balance, positions, stats) //, enableTrading, disableTrading, dump)
 
 	_, err := t.bot.Request(config)
 	if err != nil {
@@ -105,16 +105,27 @@ func (t *Telegram) ListenForCommands() {
 			} else {
 				message.Text = t.FormatBalanceMessage(r)
 			}
-		// case StatsCommand:
-		// 	var r GetStatsResponse
+		case StatsCommand:
+			var r GetStatsResponse
 
-		// 	err := t.pubsub.Request(GetStatsEvent, nil, &r)
+			err := t.pubsub.Request(GetStatsEvent, nil, &r)
 
-		// 	if err != nil {
-		// 		message.Text = err.Error()
-		// 	} else {
-		// 		message.Text = t.FormatStatsMessage(r)
-		// 	}
+			if err != nil {
+				message.Text = err.Error()
+			} else {
+				message.Text = t.FormatStatsMessage(r)
+			}
+		case PositionsCommand:
+			var r GetPositionsResponse
+
+			err := t.pubsub.Request(GetPositionsEvent, nil, &r)
+
+			if err != nil {
+				message.Text = err.Error()
+			} else {
+				message.Text = t.FormatPositionsMessage(r)
+			}
+
 		default:
 			message.Text = "Command not defined"
 		}

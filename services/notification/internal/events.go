@@ -1,5 +1,7 @@
 package internal
 
+import "time"
+
 var CriticalErrorEvent string = "Event:CriticalError"
 
 type CriticalErrorEventPayload struct {
@@ -34,6 +36,8 @@ type GetConfigsResponse struct {
 	Configs []Configs `json:"configs"`
 }
 
+var GetStatsEvent string = "Event:Stats:Get"
+
 type Stats struct {
 	Profit float64 `json:"profit"`
 	Loss   float64 `json:"loss"`
@@ -42,4 +46,17 @@ type Stats struct {
 
 type GetStatsResponse struct {
 	Stats *Stats `json:"stats"`
+}
+
+var GetPositionsEvent string = "Event:Positions:Get"
+
+type Positions struct {
+	Symbol   string    `json:"symbol"`
+	Price    float64   `json:"price"`
+	Quantity float64   `json:"quantity"`
+	Time     time.Time `json:"time"`
+}
+
+type GetPositionsResponse struct {
+	Positions []Positions `json:"positions"`
 }

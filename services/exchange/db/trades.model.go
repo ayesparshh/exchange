@@ -26,3 +26,26 @@ func (db DB) GetTrades() []Trades {
 
 	return trades
 }
+
+func (db DB) CreateTrade(symbol string, entry, exit, quantity float64) Trades {
+	trade := Trades{
+		Symbol:   symbol,
+		Entry:    entry,
+		Exit:     exit,
+		Quantity: quantity,
+		Time:     time.Now(),
+	}
+
+	result := db.conn.Create(&trade)
+
+	if result.Error != nil {
+		log.Error().Err(result.Error).
+			Str("symbol", symbol).
+			Float64("entry", entry).
+			Float64("exit", exit).
+			Float64("quantity", quantity).
+			Msg("DB.Trades.CreateTrade")
+	}
+
+	return trade
+}

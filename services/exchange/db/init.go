@@ -28,7 +28,7 @@ func New(dbURL string) DB {
 
 	err = conn.AutoMigrate(
 		&Configs{},
-		// &Positions{},
+		&Positions{},
 		&Trades{},
 		// &Strategies{},
 	)
